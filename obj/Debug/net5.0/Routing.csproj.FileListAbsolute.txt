@@ -1,0 +1,16 @@
+/home/sergej/Desktop/Routing/obj/Debug/net5.0/Routing.csproj.AssemblyReference.cache
+/home/sergej/Desktop/Routing/obj/Debug/net5.0/Routing.GeneratedMSBuildEditorConfig.editorconfig
+/home/sergej/Desktop/Routing/obj/Debug/net5.0/Routing.AssemblyInfoInputs.cache
+/home/sergej/Desktop/Routing/obj/Debug/net5.0/Routing.AssemblyInfo.cs
+/home/sergej/Desktop/Routing/obj/Debug/net5.0/Routing.csproj.CoreCompileInputs.cache
+/home/sergej/Desktop/Routing/bin/Debug/net5.0/Routing
+/home/sergej/Desktop/Routing/bin/Debug/net5.0/Routing.deps.json
+/home/sergej/Desktop/Routing/bin/Debug/net5.0/Routing.runtimeconfig.json
+/home/sergej/Desktop/Routing/bin/Debug/net5.0/Routing.runtimeconfig.dev.json
+/home/sergej/Desktop/Routing/bin/Debug/net5.0/Routing.dll
+/home/sergej/Desktop/Routing/bin/Debug/net5.0/ref/Routing.dll
+/home/sergej/Desktop/Routing/bin/Debug/net5.0/Routing.pdb
+/home/sergej/Desktop/Routing/obj/Debug/net5.0/Routing.dll
+/home/sergej/Desktop/Routing/obj/Debug/net5.0/ref/Routing.dll
+/home/sergej/Desktop/Routing/obj/Debug/net5.0/Routing.pdb
+/home/sergej/Desktop/Routing/obj/Debug/net5.0/Routing.genruntimeconfig.cache
