@@ -25,9 +25,9 @@ namespace Routing
         public void addRouter(Router router, int distance) {
             distanceRouters.Add(new DistanceVector(this.address, router.address, distance));
             ports.Add(router);
+            router.connect(this, distance, router.address, true);
             foreach (DistanceVector distanceVector in distanceRouters) {
                 if(distanceVector.to == router.address) {
-                    router.connect(this, distance, router.address, true);
                     continue;
                 }
                 router.connect(this, distanceVector.distance, distanceVector.from, false);
@@ -45,7 +45,8 @@ namespace Routing
                 ports.Add(fromRouter);
             }
             foreach(DistanceVector dv in distanceRouters) {
-                if(dv.to == fromRouter.address || dv.from == fromRouter.address) {
+                if(dv.to == fromRouter.address || dv.from == fromRouter.address
+                && dv.to == this.address || dv.from == this.address) {
                     distance+=dv.distance;
                     break;
                 }
