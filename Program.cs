@@ -30,7 +30,11 @@ namespace Routing
                 if(distanceVector.to == router.address) {
                     continue;
                 }
-                router.connect(this, distanceVector.distance, distanceVector.from, false);
+                if(distanceVector.to == this.address) {
+                    router.connect(this, distanceVector.distance, distanceVector.from, false);
+                    continue;
+                }
+                router.connect(this, distanceVector.distance, distanceVector.to, false);
 
             }
             foreach(Router rt in ports) {
