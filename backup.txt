@@ -14,6 +14,7 @@ namespace Routing
         }
     }
     class Router {
+        int version = 1;
         public string address;
         public List<DistanceVector> distanceRouters = new List<DistanceVector>();
         public List<Router> ports = new List<Router>();
@@ -25,31 +26,50 @@ namespace Routing
         public void addRouter(Router router, int distance) {
             distanceRouters.Add(new DistanceVector(this.address, router.address, distance));
             ports.Add(router);
+            version++;
+            router.connect(this, distance, router.address, true, version);
             foreach (DistanceVector distanceVector in distanceRouters) {
                 if(distanceVector.to == router.address) {
-                    router.connect(router, distance, this.address, true);
                     continue;
                 }
-                router.connect(this, distanceVector.distance, distanceVector.to, false);
-
+                router.connect(this, distanceVector.distance, distanceVector.from, false, version);
             }
             foreach(Router rt in ports) {
                 if(rt.address != router.address) {
-                    rt.connect(this, distance, router.address, false);
+                    rt.connect(this, distance, router.address, false, version);
                 }
             }
         }
-        public void connect(Router fromRouter, int distance, string to, bool addPort) {
-            if(to == this.address) {
+        public void connect(Router fromRouter, int distance, string to, bool addPort, int version) {
+            if(this.version == version) {
+                //don't update if same version;
                 return;
             }
+            this.version = version;
+            //adding version number to prevent infinite loop
             //add to ports if not added
             if(addPort) {
                 ports.Add(fromRouter);
             }
+            bool sendData = true;
+            foreach(DistanceVector dv in distanceRouters) {
+                if(dv.to == to && dv.from == fromRouter.address
+                || dv.to == fromRouter.address && dv.from == to) {
+                    sendData = false;
+                    break;
+                }
+                if(dv.to == fromRouter.address || dv.from == fromRouter.address
+                && dv.to == this.address || dv.from == this.address) {
+                    distance+=dv.distance;
+                    break;
+                }
+            }
+            if(!sendData) {
+                return;
+            }
             foreach(Router rt in ports) {
                 if(rt.address != fromRouter.address && rt.address != this.address) {
-                    rt.connect(this, distance, to, false);
+                    rt.connect(this, distance, to, false, version);
                 }
             }
             distanceRouters.Add(new DistanceVector(fromRouter.address, to, distance));
@@ -60,6 +80,10 @@ namespace Routing
             foreach (DistanceVector dv in distanceRouters) {
                 res += $"[{dv.from}][{dv.to}]"+dv.distance+"\n";
             }
+            res += $"\nPorts {address}: \n";
+            foreach(Router port in this.ports) {
+                res += $"[{port.address}]\n";
+            }
             System.Console.WriteLine(res);
             return res;
         }
@@ -68,14 +92,18 @@ namespace Routing
     {
         static void Main(string[] args)
         {
-            Router router1 = new Router("A");
-            Router router2 = new Router("B");
-            Router router3 = new Router("C");
-            router1.addRouter(router2, 2);
-            router2.addRouter(router3, 1);
-            router1.ToString();
-            router2.ToString();
-            router3.ToString();
+            Router routerA = new Router("A");
+            Router routerB = new Router("B");
+            Router routerC = new Router("C");
+            Router routerD = new Router("D");
+            routerA.addRouter(routerB, 2);
+            routerA.addRouter(routerC, 6);
+            routerB.addRouter(routerD, 1);
+            routerD.addRouter(routerC, 1);
+            routerA.ToString();
+            routerB.ToString();
+            routerC.ToString();
+            routerD.ToString();
         }
     }
 }
