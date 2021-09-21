@@ -14,6 +14,7 @@ namespace Routing
         }
     }
     class Router {
+        int version = 0;
         public string address;
         public List<DistanceVector> distanceRouters = new List<DistanceVector>();
         public List<Router> ports = new List<Router>();
@@ -23,41 +24,45 @@ namespace Routing
         }
 
         public void addRouter(Router router, int distance) {
+            version++;
             distanceRouters.Add(new DistanceVector(this.address, router.address, distance));
             ports.Add(router);
-            router.connect(this, distance, router.address, true);
+            router.connect(this, distance, router.address, true, version);
             foreach (DistanceVector distanceVector in distanceRouters) {
                 if(distanceVector.to == router.address) {
                     continue;
                 }
-                if(distanceVector.to == this.address) {
-                    router.connect(this, distanceVector.distance, distanceVector.from, false);
-                    continue;
-                }
-                router.connect(this, distanceVector.distance, distanceVector.to, false);
-
+                //syncing is true now
+                router.connect(this, distanceVector.distance, distanceVector.to, false, version, true);
             }
             foreach(Router rt in ports) {
                 if(rt.address != router.address) {
-                    rt.connect(this, distance, router.address, false);
+                    rt.connect(this, distance, router.address, false, version);
                 }
             }
         }
-        public void connect(Router fromRouter, int distance, string to, bool addPort) {
+        public void connect(Router fromRouter, int distance, string to, bool addPort, int version, bool syncing = false, bool isNewRoute=false) {
+            if(this.version == version && !syncing) {
+                return;
+            }
+            this.version = version;
             //add to ports if not added
             if(addPort) {
                 ports.Add(fromRouter);
             }
             foreach(DistanceVector dv in distanceRouters) {
-                if(dv.to == fromRouter.address || dv.from == fromRouter.address
-                && dv.to == this.address || dv.from == this.address) {
+                if(isNewRoute) {
+                    break;
+                }
+                if((dv.to == fromRouter.address || dv.from == fromRouter.address
+                && dv.to == this.address || dv.from == this.address) && !isNewRoute) {
                     distance+=dv.distance;
                     break;
                 }
             }
             foreach(Router rt in ports) {
-                if(rt.address != fromRouter.address && rt.address != this.address) {
-                    rt.connect(this, distance, to, false);
+                if(rt.address != fromRouter.address) {
+                    rt.connect(this, distance, to, false, version, false, true);
                 }
             }
             distanceRouters.Add(new DistanceVector(fromRouter.address, to, distance));
@@ -80,17 +85,18 @@ namespace Routing
     {
         static void Main(string[] args)
         {
-            Router router1 = new Router("A");
-            Router router2 = new Router("B");
-            Router router3 = new Router("C");
-            Router router4 = new Router("D");
-            router1.addRouter(router2, 2);
-            router2.addRouter(router3, 1);
-            router3.addRouter(router4, 3);
-            router1.ToString();
-            router2.ToString();
-            router3.ToString();
-            router4.ToString();
+            Router routerA = new Router("A");
+            Router routerB = new Router("B");
+            Router routerC = new Router("C");
+            Router routerD = new Router("D");
+            routerA.addRouter(routerB, 2);
+            routerB.addRouter(routerC, 1);
+            routerC.addRouter(routerD, 3);
+            routerD.addRouter(routerB, 1);
+            routerA.ToString();
+            routerB.ToString();
+            routerC.ToString();
+            routerD.ToString();
         }
     }
 }
