@@ -29,7 +29,7 @@ namespace Routing
             router.connect(this, distance, router.address, true, version);
             foreach (DistanceVector distanceVector in distanceRouters) {
                 //syncing is true now
-                router.connect(this, distanceVector.distance, distanceVector.to, false, version, true);
+                router.connect(this, distanceVector.distance+distance, distanceVector.to, false, version, true);
             }
             foreach(Router rt in ports) {
                 if(rt.address != router.address) {
@@ -44,13 +44,7 @@ namespace Routing
             }
             this.version = version;
             //does the router already have a path
-            bool hasPath = false;
-            foreach(DistanceVector dv in distanceRouters) {
-                if(dv.to == to){
-                    hasPath = true;
-                    break;
-                }
-            }
+            bool hasPath = hasRoute(to);
             //add to ports if not added
             if(addPort) {
                 ports.Add(fromRouter);
@@ -70,7 +64,29 @@ namespace Routing
             }
             distanceRouters.Add(new DistanceVector(to, fromRouter.address, distance));
         }
-
+        public bool hasPort(string port) {
+            bool res = false;
+            if(port == this.address) {
+                return true;
+            }
+            foreach(Router rt in ports) {
+                if(rt.address == port) {
+                    res = true;
+                    break;
+                }
+            }
+            return res;
+        }
+        public bool hasRoute(string to) {
+            bool res = false;
+            foreach(DistanceVector dv in distanceRouters) {
+                if(dv.to == to){
+                    res = true;
+                    break;
+                }
+            }
+            return res;
+        }
         public override string ToString() {
             string res = $"Router {address}: \n";
             foreach (DistanceVector dv in distanceRouters) {
@@ -82,6 +98,19 @@ namespace Routing
             }
             System.Console.WriteLine(res);
             return res;
+        }
+        public void shortest(string to) {
+            int min = -1;
+            foreach (DistanceVector dv in distanceRouters) {
+                if(dv.to == to) {
+                    if(min == -1){ 
+                        min = dv.distance;
+                    }else if(dv.distance < min) {
+                        min = dv.distance;
+                    }
+                }
+            }
+            System.Console.WriteLine($"Min do {to} je {min}\n");
         }
     }
     class Program
@@ -96,10 +125,9 @@ namespace Routing
             routerB.addRouter(routerC, 1);
             routerC.addRouter(routerD, 3);
             routerD.addRouter(routerB, 1);
-            routerA.ToString();
-            routerB.ToString();
-            routerC.ToString();
-            routerD.ToString();
+            routerA.shortest("B");
+            routerA.shortest("C");
+            routerA.shortest("D");
         }
     }
 }
