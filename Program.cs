@@ -49,11 +49,13 @@ namespace Routing
             if(addPort) {
                 ports.Add(fromRouter);
             }
-            foreach(DistanceVector dv in distanceRouters) {
-                if(dv.to == fromRouter.address) {
-                    if(!hasPath) {
-                        distance+=dv.distance;
-                        break;
+            if(!addPort) {
+                foreach(DistanceVector dv in distanceRouters) {
+                    if(dv.to == fromRouter.address && fromRouter.address != this.address) {
+                        if(!hasPath) {
+                            distance+=dv.distance;
+                            break;
+                        }
                     }
                 }
             }
@@ -62,7 +64,16 @@ namespace Routing
                     rt.connect(this, distance, to, false, version, false);
                 }
             }
-            distanceRouters.Add(new DistanceVector(to, fromRouter.address, distance));
+            if(to == this.address) {
+                distanceRouters.Add(new DistanceVector(this.address, fromRouter.address, 
+                distance));
+            }else if(this.address != fromRouter.address && fromRouter.address != to) {
+                distanceRouters.Add(new DistanceVector(fromRouter.address,to, 
+                distance));
+            }else {
+                distanceRouters.Add(new DistanceVector(this.address,to, 
+                distance));
+            }
         }
         public bool hasPort(string port) {
             bool res = false;
@@ -101,16 +112,19 @@ namespace Routing
         }
         public void shortest(string to) {
             int min = -1;
+            string from="";
             foreach (DistanceVector dv in distanceRouters) {
                 if(dv.to == to) {
                     if(min == -1){ 
                         min = dv.distance;
+                        from = dv.from;
                     }else if(dv.distance < min) {
                         min = dv.distance;
+                        from = dv.from;
                     }
                 }
             }
-            System.Console.WriteLine($"Min do {to} je {min}\n");
+            System.Console.WriteLine($"{this.address} je minimum {from} do {to}: {min}\n");
         }
     }
     class Program
@@ -125,6 +139,13 @@ namespace Routing
             routerB.addRouter(routerC, 1);
             routerC.addRouter(routerD, 3);
             routerD.addRouter(routerB, 1);
+            routerA.ToString();
+            routerB.ToString();
+            routerC.ToString();
+            routerD.ToString();
+            routerB.shortest("A");
+            routerB.shortest("C");
+            routerB.shortest("D");
             routerA.shortest("B");
             routerA.shortest("C");
             routerA.shortest("D");
