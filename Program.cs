@@ -25,13 +25,9 @@ namespace Routing
 
         public void addRouter(Router router, int distance) {
             version++;
-            distanceRouters.Add(new DistanceVector(this.address, router.address, distance));
             ports.Add(router);
             router.connect(this, distance, router.address, true, version);
             foreach (DistanceVector distanceVector in distanceRouters) {
-                if(distanceVector.to == router.address) {
-                    continue;
-                }
                 //syncing is true now
                 router.connect(this, distanceVector.distance, distanceVector.to, false, version, true);
             }
@@ -40,32 +36,39 @@ namespace Routing
                     rt.connect(this, distance, router.address, false, version);
                 }
             }
+            distanceRouters.Add(new DistanceVector(this.address, router.address, distance));
         }
-        public void connect(Router fromRouter, int distance, string to, bool addPort, int version, bool syncing = false, bool isNewRoute=false) {
+        public void connect(Router fromRouter, int distance, string to, bool addPort, int version, bool syncing = false) {
             if(this.version == version && !syncing) {
                 return;
             }
             this.version = version;
+            //does the router already have a path
+            bool hasPath = false;
+            foreach(DistanceVector dv in distanceRouters) {
+                if(dv.to == to){
+                    hasPath = true;
+                    break;
+                }
+            }
             //add to ports if not added
             if(addPort) {
                 ports.Add(fromRouter);
             }
             foreach(DistanceVector dv in distanceRouters) {
-                if(isNewRoute) {
-                    break;
-                }
-                if((dv.to == fromRouter.address || dv.from == fromRouter.address
-                && dv.to == this.address || dv.from == this.address) && !isNewRoute) {
-                    distance+=dv.distance;
-                    break;
+                if(dv.to == fromRouter.address) {
+                    if(!hasPath) {
+                        distance+=dv.distance;
+                        break;
+                    }
                 }
             }
             foreach(Router rt in ports) {
                 if(rt.address != fromRouter.address) {
-                    rt.connect(this, distance, to, false, version, false, true);
+                    rt.connect(this, distance, to, false, version, false);
                 }
             }
-            distanceRouters.Add(new DistanceVector(fromRouter.address, to, distance));
+            distanceRouters.Add(new DistanceVector(to, fromRouter.address, distance));
         }
 
         public override string ToString() {
