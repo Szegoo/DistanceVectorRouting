@@ -51,7 +51,7 @@ namespace Routing
             }
             if(!addPort) {
                 foreach(DistanceVector dv in distanceRouters) {
-                    if(dv.to == fromRouter.address && fromRouter.address != this.address) {
+                    if(dv.to == fromRouter.address) {
                         if(!hasPath) {
                             distance+=dv.distance;
                             break;
@@ -61,7 +61,7 @@ namespace Routing
             }
             foreach(Router rt in ports) {
                 if(rt.address != fromRouter.address) {
-                    rt.connect(this, distance, to, false, version, false);
+                    rt.connect(this, distance, to, false, version);
                 }
             }
             if(to == this.address) {
@@ -75,19 +75,6 @@ namespace Routing
                 distance));
             }
         }
-        public bool hasPort(string port) {
-            bool res = false;
-            if(port == this.address) {
-                return true;
-            }
-            foreach(Router rt in ports) {
-                if(rt.address == port) {
-                    res = true;
-                    break;
-                }
-            }
-            return res;
-        }
         public bool hasRoute(string to) {
             bool res = false;
             foreach(DistanceVector dv in distanceRouters) {
@@ -99,6 +86,7 @@ namespace Routing
             return res;
         }
         public override string ToString() {
+            System.Console.WriteLine($"Version: {version}");
             string res = $"Router {address}: \n";
             foreach (DistanceVector dv in distanceRouters) {
                 res += $"[{dv.from}][{dv.to}]"+dv.distance+"\n";
