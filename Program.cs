@@ -41,7 +41,7 @@ namespace Routing
             }
             this.version = version;
             //does the router already have a path
-            bool hasPath = hasRoute(to);
+            bool hasPath = hasRoute(fromRouter.address);
             //add to ports if not added
             if(addPort) {
                 ports.Add(fromRouter);
@@ -49,7 +49,7 @@ namespace Routing
             if(!addPort) {
                 foreach(DistanceVector dv in distanceRouters) {
                     if(dv.to == fromRouter.address) {
-                        if(hasPath && dv.from == fromRouter.address) {
+                        if(hasPath && (dv.from == fromRouter.address || dv.from == this.address)) {
                             distance+=dv.distance;
                             break;
                         }

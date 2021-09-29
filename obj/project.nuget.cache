@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "igXV59+zTWu7pJWcC04/qXQU1PPhbr9BCanMx+HQEO9iyItbXeKMqG069NwKBjTa5z1iryhBA1468+4+j7zFsA==",
+  "dgSpecHash": "4tIp/eTzKgwnZa3E7TmX5TgrRe7G9KAyGUENXLrvCPCRBW9R7bsI/0WX7iDFdGvZA9oXD1HJwGFpiLXz7HQM0A==",
   "success": true,
-  "projectFilePath": "/home/sergej/Desktop/Routing/Routing.csproj",
+  "projectFilePath": "C:\\Users\\sakac\\Desktop\\Routing\\DistanceVectorRouting\\Routing.csproj",
   "expectedPackageFiles": [],
   "logs": []
 }
