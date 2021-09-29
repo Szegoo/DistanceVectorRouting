@@ -52,22 +52,28 @@ namespace Routing
             if(!addPort) {
                 foreach(DistanceVector dv in distanceRouters) {
                     if(dv.to == fromRouter.address) {
-                        if(!hasPath) {
+                        if(hasPath) {
                             distance+=dv.distance;
                             break;
                         }
                     }
                 }
             }
+
             foreach(Router rt in ports) {
                 if(rt.address != fromRouter.address) {
-                    rt.connect(this, distance, to, false, version);
+                    if(to == this.address) {
+                        rt.connect(this, distance, fromRouter.address, false, version);
+                    }else {
+                        rt.connect(this, distance, to, false, version);
+                    }
                 }
             }
+
             if(to == this.address) {
                 distanceRouters.Add(new DistanceVector(this.address, fromRouter.address, 
                 distance));
-            }else if(this.address != fromRouter.address && fromRouter.address != to) {
+            }else if(this.address != fromRouter.address) {
                 distanceRouters.Add(new DistanceVector(fromRouter.address,to, 
                 distance));
             }else {
