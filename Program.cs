@@ -27,15 +27,12 @@ namespace Routing
             version++;
             ports.Add(router);
             router.connect(this, distance, router.address, true, version);
-            foreach (DistanceVector distanceVector in distanceRouters) {
-                //syncing is true now
-                router.connect(this, distanceVector.distance+distance, distanceVector.to, false, version, true);
-            }
             foreach(Router rt in ports) {
                 if(rt.address != router.address) {
                     rt.connect(this, distance, router.address, false, version);
                 }
             }
+            sync(router, distance);
             distanceRouters.Add(new DistanceVector(this.address, router.address, distance));
         }
         public void connect(Router fromRouter, int distance, string to, bool addPort, int version, bool syncing = false) {
@@ -52,7 +49,7 @@ namespace Routing
             if(!addPort) {
                 foreach(DistanceVector dv in distanceRouters) {
                     if(dv.to == fromRouter.address) {
-                        if(hasPath) {
+                        if(hasPath && dv.from == fromRouter.address) {
                             distance+=dv.distance;
                             break;
                         }
@@ -69,7 +66,6 @@ namespace Routing
                     }
                 }
             }
-
             if(to == this.address) {
                 distanceRouters.Add(new DistanceVector(this.address, fromRouter.address, 
                 distance));
@@ -79,6 +75,17 @@ namespace Routing
             }else {
                 distanceRouters.Add(new DistanceVector(this.address,to, 
                 distance));
+            }
+            if(addPort) { 
+                sync(fromRouter, distance);
+            }
+        }
+        public void sync(Router router, int distance) {
+            foreach (DistanceVector distanceVector in distanceRouters) {
+                if(distanceVector.to != router.address) {
+                    //syncing is true now
+                    router.connect(this, distanceVector.distance+distance, distanceVector.to, false, version, true);
+                }
             }
         }
         public bool hasRoute(string to) {
@@ -118,7 +125,7 @@ namespace Routing
                     }
                 }
             }
-            System.Console.WriteLine($"{this.address} je minimum {from} do {to}: {min}\n");
+            System.Console.WriteLine($"Za {this.address} je minimum {from} do {to}: {min}\n");
         }
     }
     class Program
@@ -133,16 +140,23 @@ namespace Routing
             routerB.addRouter(routerC, 1);
             routerC.addRouter(routerD, 3);
             routerD.addRouter(routerB, 1);
-            routerA.ToString();
-            routerB.ToString();
-            routerC.ToString();
-            routerD.ToString();
-            routerB.shortest("A");
-            routerB.shortest("C");
-            routerB.shortest("D");
+            routerA.addRouter(routerC, 2);
+
             routerA.shortest("B");
             routerA.shortest("C");
             routerA.shortest("D");
+            System.Console.WriteLine("-------");
+            routerB.shortest("A");
+            routerB.shortest("C");
+            routerB.shortest("D");
+            System.Console.WriteLine("-------");
+            routerC.shortest("A");
+            routerC.shortest("B");
+            routerC.shortest("D");
+            System.Console.WriteLine("-------");
+            routerD.shortest("A");
+            routerD.shortest("B");
+            routerD.shortest("C");
         }
     }
 }
